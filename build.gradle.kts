@@ -28,13 +28,13 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "daa.Main"
 }
 
 tasks.named<Test>("test") {
@@ -42,6 +42,10 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}
+
+tasks.withType(JavaCompile::class.java) {
+    options.encoding = "UTF-8"
 }
