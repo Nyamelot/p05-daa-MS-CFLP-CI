@@ -5,8 +5,22 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import daa.model.Instance;
 
+/**
+ * Utility class responsible for reading and parsing .dzn files into {@link Instance} objects.
+ * * This parser handles standard Minizinc data format variables such as Warehouses, Stores,
+ * Capacity, FixedCost, Goods, SupplyCost, and IncompatiblePairs.
+ * @author Jose Angel Portillo Garcia
+ * @version 2025-2026
+ */
 public class Parser {
 
+  /**
+   * Parses a .dzn file to create a problem instance.
+   * * @param filePath The path to the .dzn file to be parsed.
+   * @return A fully populated {@link Instance} object.
+   * @throws FileNotFoundException If the file cannot be located.
+   * @throws IllegalStateException If required data fields are missing from the file.
+   */
   public static Instance parse(String filePath) throws FileNotFoundException {
     File file = new File(filePath);
     Scanner sc = new Scanner(file);
@@ -18,14 +32,12 @@ public class Parser {
     double[][] supplyCosts = null;
     boolean[][] incompatibilityMatrix = null;
 
-    // Split by semicolon to isolate each variable block
     sc.useDelimiter(";");
 
     while (sc.hasNext()) {
       String block = sc.next().trim();
       if (block.isEmpty()) continue;
 
-      // Handle variables using split with limit to avoid issues with content inside arrays
       String[] parts = block.split("=", 2);
       if (parts.length < 2) continue;
 
@@ -61,7 +73,6 @@ public class Parser {
     }
     sc.close();
 
-    // Safety check to ensure no nulls are passed to the Instance constructor
     if (capacities == null || fixedCosts == null || demands == null ||
       supplyCosts == null || incompatibilityMatrix == null) {
       throw new IllegalStateException("Error: Some required data fields were not found in the file: " + filePath);
@@ -70,8 +81,12 @@ public class Parser {
     return new Instance(warehouses, stores, nIncomp, capacities, fixedCosts, demands, supplyCosts, incompatibilityMatrix);
   }
 
+  /**
+   * Parses a 1D integer array from the Minizinc format [x, y, z].
+   * * @param content The raw string content of the array.
+   * @return An integer array.
+   */
   private static int[] parse1DInt(String content) {
-    // Remove brackets and all whitespace (newlines/spaces)
     String clean = content.replaceAll("[\\[\\]\\s+]", "");
     String[] parts = clean.split(",");
     int[] arr = new int[parts.length];
@@ -81,6 +96,11 @@ public class Parser {
     return arr;
   }
 
+  /**
+   * Parses a 1D double array from the Minizinc format [x, y, z].
+   * * @param content The raw string content of the array.
+   * @return A double array.
+   */
   private static double[] parse1DDouble(String content) {
     String clean = content.replaceAll("[\\[\\]\\s+]", "");
     String[] parts = clean.split(",");
@@ -91,14 +111,19 @@ public class Parser {
     return arr;
   }
 
+  /**
+   * Parses a 2D matrix from the Minizinc format [| x, y | a, b |].
+   * * @param content The raw string content of the matrix.
+   * @param rows Expected number of rows.
+   * @param cols Expected number of columns.
+   * @return A 2D double matrix.
+   */
   private static double[][] parseMatrix(String content, int rows, int cols) {
     double[][] matrix = new double[rows][cols];
-    // Remove the [| and |] and then split by the internal pipe |
     String clean = content.replace("[|", "").replace("|]", "").trim();
     String[] lineParts = clean.split("\\|");
 
     for (int i = 0; i < rows; i++) {
-      // Clean each row of whitespace and split by comma
       String[] values = lineParts[i].replaceAll("\\s+", "").split(",");
       for (int j = 0; j < cols; j++) {
         matrix[i][j] = Double.parseDouble(values[j]);
@@ -107,9 +132,15 @@ public class Parser {
     return matrix;
   }
 
+  /**
+   * Parses the incompatibility pairs and converts them into a symmetric boolean matrix.
+   * Note: Converts 1-based .dzn indices to 0-based Java indices.
+   * * @param content The raw string content of the pairs matrix.
+   * @param n The total number of stores (dimension of the matrix).
+   * @return A symmetric boolean matrix where true indicates incompatibility.
+   */
   private static boolean[][] parsePairs(String content, int n) {
     boolean[][] matrix = new boolean[n][n];
-    // Handle the case where IncompatiblePairs might be empty [| |]
     if (!content.contains(",") || content.length() < 5) return matrix;
 
     String clean = content.replace("[|", "").replace("|]", "").trim();
@@ -118,7 +149,6 @@ public class Parser {
     for (String pair : pairs) {
       String[] parts = pair.replaceAll("\\s+", "").split(",");
       if (parts.length == 2) {
-        // Convert 1-based index from .dzn to 0-based Java index
         int u = Integer.parseInt(parts[0]) - 1;
         int v = Integer.parseInt(parts[1]) - 1;
         matrix[u][v] = true;

@@ -1,14 +1,22 @@
 package daa.utils;
 
-import daa.model.Instance;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility class for file system operations related to the MS-CFLP-CI problem.
+ * * This class provides helper methods to manage and filter problem instances
+ * stored in the local file system.
+ * @author Jose Angel Portillo Garcia
+ * @version 2025-2026
+ */
 public class FileUtils {
 
   /**
-   * Retorna una lista de todos los archivos .dzn en el directorio especificado.
+   * Retrieves a list of all files with the .dzn extension within a specific directory.
+   * * @param directoryPath The relative or absolute path to the directory containing instances.
+   * @return A {@link List} of {@link File} objects pointing to the .dzn files found.
    */
   public static List<File> getDznFiles(String directoryPath) {
     File folder = new File(directoryPath);

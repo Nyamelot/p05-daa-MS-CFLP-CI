@@ -3,6 +3,14 @@ package daa.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a candidate solution for the MS-CFLP-CI problem.
+ * * This class maintains the state of opened facilities, customer assignments,
+ * and auxiliary structures like residual capacities and incompatibility counters
+ * to allow for efficient feasibility checks during search processes.
+ * @author Jose Angel Portillo Garcia
+ * @version 2025-2026
+ */
 public class Solution {
   private final Instance instance;
   public boolean[] open;
@@ -16,6 +24,10 @@ public class Solution {
   private double transportCost;
   private double totalCost;
 
+  /**
+   * Initializes a new Solution with empty assignments and full residual capacities.
+   * * @param instance The problem instance defining dimensions and constraints.
+   */
   @SuppressWarnings("unchecked")
   public Solution(Instance instance) {
     this.instance = instance;
@@ -37,10 +49,20 @@ public class Solution {
     }
   }
 
+  /**
+   * Determines if a store is compatible with a warehouse based on current assignments.
+   * * @param storeId The ID of the store to check.
+   * @param warehouseId The ID of the target warehouse.
+   * @return {@code true} if no incompatible stores are currently assigned to the warehouse; {@code false} otherwise.
+   */
   public boolean isCompatible(int storeId, int warehouseId) {
     return incompCount[storeId][warehouseId] == 0;
   }
 
+  /**
+   * Calculates the fixed costs of open facilities and the variable transportation
+   * costs based on current assignments.
+   */
   public void calculateCosts() {
     this.fixedCost = 0;
     this.transportCost = 0;
@@ -59,8 +81,24 @@ public class Solution {
     this.totalCost = this.fixedCost + this.transportCost;
   }
 
-  // Getters
-  public double getTotalCost() { return totalCost; }
-  public double getFixedCost() { return fixedCost; }
-  public double getTransportCost() { return transportCost; }
+  /**
+   * @return The total cost (Fixed + Transport).
+   */
+  public double getTotalCost() {
+    return totalCost;
+  }
+
+  /**
+   * @return The sum of fixed costs for all open facilities.
+   */
+  public double getFixedCost() {
+    return fixedCost;
+  }
+
+  /**
+   * @return The sum of variable transportation costs.
+   */
+  public double getTransportCost() {
+    return transportCost;
+  }
 }

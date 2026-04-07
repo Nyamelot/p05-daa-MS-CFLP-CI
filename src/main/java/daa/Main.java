@@ -13,7 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Main entry point for the MS-CFLP-CI Solver application.
+ * * This class provides a command-line interface to select between Greedy and GRASP
+ * algorithms and allows for processing a single instance or all instances in a directory.
+ * @author Jose Angel Portillo Garcia
+ * @version 2025-2026
+ */
 public class Main {
+  /**
+   * Main method that handles user input and orchestrates the execution of algorithms.
+   * * @param args Command line arguments (not used).
+   */
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
 
@@ -29,7 +40,6 @@ public class Main {
     System.out.print("Seleccione opción: ");
     int modeChoice = scanner.nextInt();
 
-    // Listas para almacenar resultados y calcular el Promedio final
     List<Solution> allSolutions = new ArrayList<>();
     List<Double> allTimes = new ArrayList<>();
 
@@ -54,11 +64,15 @@ public class Main {
       if (files != null && files.length > 0) {
         if (algoChoice == 1) {
           LogFormatter.printGreedyHeader();
-          for (File f : files) executeGreedy(f, allSolutions, allTimes);
+          for (File f : files) {
+            executeGreedy(f, allSolutions, allTimes);
+          }
           LogFormatter.printSummary(allSolutions, allTimes, false);
         } else {
           LogFormatter.printGraspHeader();
-          for (File f : files) executeGrasp(f, allSolutions, allTimes);
+          for (File f : files) {
+            executeGrasp(f, allSolutions, allTimes);
+          }
           LogFormatter.printSummary(allSolutions, allTimes, true);
         }
       } else {
@@ -69,7 +83,10 @@ public class Main {
   }
 
   /**
-   * Ejecuta el Algoritmo Voraz siguiendo el Algorithm 1 del documento[cite: 149].
+   * Logic to execute the Greedy strategy on a specific file and log the results.
+   * * @param file The .dzn instance file.
+   * @param solutions List to store the resulting solution.
+   * @param times List to store the execution time.
    */
   private static void executeGreedy(File file, List<Solution> solutions, List<Double> times) {
     try {
@@ -90,19 +107,20 @@ public class Main {
   }
 
   /**
-   * Ejecuta el Algoritmo GRASP con el ajuste de parámetros requerido[cite: 237].
+   * Logic to execute the GRASP strategy on a specific file with required parameter tuning.
+   * * @param file The .dzn instance file.
+   * @param solutions List to store resulting solutions across configurations.
+   * @param times List to store execution times.
    */
   private static void executeGrasp(File file, List<Solution> solutions, List<Double> times) {
     try {
       Instance instance = Parser.parse(file.getAbsolutePath());
 
-      // Configuración requerida por la Tabla 13: LRC {2, 3} y 3 ejecuciones por instancia
       int[] lrcSizes = {2, 3};
       int executionsPerConfig = 3;
 
       for (int lrc : lrcSizes) {
         for (int e = 1; e <= executionsPerConfig; e++) {
-          // Se asume que el constructor de GraspStrategy acepta (LRC, Iteraciones, BúsquedasLocales)
           InstanceSolveStrategy strategy = new GraspStrategy(lrc, 100, new ArrayList<>());
 
           long start = System.nanoTime();
