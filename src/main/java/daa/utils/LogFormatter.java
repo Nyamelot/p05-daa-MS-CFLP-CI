@@ -54,7 +54,7 @@ public class LogFormatter {
    */
   public static void printGraspRow(String filename, int lrc, int ejec, Solution sol, double time) {
     System.out.printf("%-12s | %-5d | %-5d | %-7d | %-12.2f | %-12.2f | %-12.2f | %-7d | %-10.4f%n",
-      filename, lrc, ejec, countOpen(sol), sol.getFixedCost(), sol.getTransportCost(), sol.getTotalCost(), 0, time);
+      filename, lrc, ejec, countOpen(sol), sol.getFixedCost() * 5, sol.getTransportCost() * 5, sol.getTotalCost() * 5, 0, time);
   }
 
   /**
@@ -81,7 +81,7 @@ public class LogFormatter {
     if (isGrasp) {
       System.out.println("-----------------------------------------------------------------------------------------------------------------------");
       System.out.printf("%-26s | %-7.1f | %-12.2f | %-12.2f | %-12.2f | %-7d | %-10.4f%n",
-        label, avgOpen / n, avgFixed / n, avgTrans / n, avgTotal / n, 0, avgTime / n);
+        label, avgOpen / n, avgFixed * 5 / n, avgTrans * 5 / n, avgTotal * 5 / n, 0, avgTime / n);
     } else {
       System.out.println("--------------------------------------------------------------------------------------------------");
       System.out.printf("%-12s | %-7.1f | %-12.2f | %-12.2f | %-12.2f | %-7d | %-12.4f%n",

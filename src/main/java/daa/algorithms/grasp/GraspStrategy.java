@@ -42,7 +42,6 @@ public class GraspStrategy implements InstanceSolveStrategy {
     for (int i = 0; i < maxIterations; i++) {
       Solution current = constructivePhase(instance);
       applyLocalSearch(current, instance);
-
       if (bestGlobal == null || current.getTotalCost() < bestGlobal.getTotalCost()) {
         bestGlobal = current;
       }

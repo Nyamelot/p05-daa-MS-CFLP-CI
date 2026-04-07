@@ -7,6 +7,9 @@ import daa.model.Instance;
 import daa.model.Solution;
 import daa.utils.Parser;
 import daa.utils.LogFormatter;
+import daa.algorithms.grasp.LocalSearchStrategy;
+import daa.algorithms.grasp.ShiftStrategy;
+import daa.algorithms.grasp.SwapStrategy;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -112,23 +115,21 @@ public class Main {
    * @param solutions List to store resulting solutions across configurations.
    * @param times List to store execution times.
    */
-  private static void executeGrasp(File file, List<Solution> solutions, List<Double> times) {
+   private static void executeGrasp(File file, List<Solution> solutions, List<Double> times) {
     try {
       Instance instance = Parser.parse(file.getAbsolutePath());
-
+      List<LocalSearchStrategy> movements = new ArrayList<>();
+      movements.add(new ShiftStrategy());
+      movements.add(new SwapStrategy());
       int[] lrcSizes = {2, 3};
       int executionsPerConfig = 3;
-
       for (int lrc : lrcSizes) {
         for (int e = 1; e <= executionsPerConfig; e++) {
-          InstanceSolveStrategy strategy = new GraspStrategy(lrc, 100, new ArrayList<>());
-
+          InstanceSolveStrategy strategy = new GraspStrategy(lrc, 100, movements);   
           long start = System.nanoTime();
           Solution sol = strategy.solve(instance);
           double time = (System.nanoTime() - start) / 1e9;
-
           LogFormatter.printGraspRow(file.getName(), lrc, e, sol, time);
-
           solutions.add(sol);
           times.add(time);
         }

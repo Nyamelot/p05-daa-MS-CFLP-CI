@@ -23,25 +23,15 @@ public class ShiftStrategy implements LocalSearchStrategy {
   @Override
   public boolean improve(Solution sol, Instance instance) {
     for (int i = 0; i < instance.getNumStores(); i++) {
-      // Check if the store is currently assigned
       if (sol.facilitiesOf[i].isEmpty()) {
         continue;
       }
-
-      // Get the current facility serving store i
       int currentJ = sol.facilitiesOf[i].get(0);
-
       for (int targetJ = 0; targetJ < instance.getNumWarehouses(); targetJ++) {
-        // The target facility must be open and different from the current one
         if (sol.open[targetJ] && targetJ != currentJ) {
-
-          // 1. Feasibility Check: Capacity and Incompatibility
           if (sol.residualCap[targetJ] >= instance.getDemand(i) && sol.isCompatible(i, targetJ)) {
-
             double currentCost = instance.getTransportCost(i, currentJ);
             double targetCost = instance.getTransportCost(i, targetJ);
-
-            // 2. Improvement Check: Is the new assignment cheaper?
             if (targetCost < currentCost) {
               applyShift(sol, instance, i, currentJ, targetJ);
               return true;
@@ -63,23 +53,16 @@ public class ShiftStrategy implements LocalSearchStrategy {
    * @param newJ The ID of the target facility.
    */
   private void applyShift(Solution sol, Instance instance, int i, int oldJ, int newJ) {
-    // Update Assignment and Indicator matrices
     sol.x[i][oldJ] = 0;
     sol.w[i][oldJ] = false;
     sol.x[i][newJ] = 1.0;
     sol.w[i][newJ] = true;
-
-    // Update Capacities
     sol.residualCap[oldJ] += instance.getDemand(i);
     sol.residualCap[newJ] -= instance.getDemand(i);
-
-    // Update Relationship lists
     sol.clientsOf[oldJ].remove(Integer.valueOf(i));
     sol.clientsOf[newJ].add(i);
     sol.facilitiesOf[i].clear();
     sol.facilitiesOf[i].add(newJ);
-
-    // Update Incompatibility tracking counters for the involved hubs
     for (int k = 0; k < instance.getNumStores(); k++) {
       if (instance.areIncompatible(i, k)) {
         sol.incompCount[k][oldJ]--;
